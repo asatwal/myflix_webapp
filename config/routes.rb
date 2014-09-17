@@ -7,6 +7,10 @@ Myflix::Application.routes.draw do
     collection do
       get :search
     end
+
+    member do
+      post :review
+    end
   end
 
   resources :users, only: [:new, :create]

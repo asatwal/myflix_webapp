@@ -19,7 +19,7 @@ describe Category do
   
   it {should have_many(:videos)}
 
-  describe "recent_videos" do
+  describe "#recent_videos" do
 
     it "returns recent videos with most recent first" do
 
