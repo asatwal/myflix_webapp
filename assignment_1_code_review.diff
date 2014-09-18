@@ -1,0 +1,363 @@
+diff --git a/Gemfile b/Gemfile
+index 286a310..45c9532 100644
+--- a/Gemfile
++++ b/Gemfile
+@@ -27,6 +27,8 @@ end
+ group :test do
+   gem 'database_cleaner', '1.2.0'
+   gem 'shoulda-matchers'
++  gem 'fabrication'
++  gem 'faker'
+ end
+ 
+ group :production do
+diff --git a/Gemfile.lock b/Gemfile.lock
+index d52a924..a871b00 100644
+--- a/Gemfile.lock
++++ b/Gemfile.lock
+@@ -53,6 +53,9 @@ GEM
+     erubis (2.7.0)
+     eventmachine (1.0.0)
+     execjs (2.0.2)
++    fabrication (2.11.3)
++    faker (1.4.3)
++      i18n (~> 0.5)
+     haml (4.0.5)
+       tilt
+     haml-rails (0.5.3)
+@@ -166,6 +169,8 @@ DEPENDENCIES
+   bootstrap_form
+   coffee-rails
+   database_cleaner (= 1.2.0)
++  fabrication
++  faker
+   haml-rails
+   jquery-rails
+   pg
+diff --git a/app/controllers/application_controller.rb b/app/controllers/application_controller.rb
+index 4dcbab9..da47cb3 100644
+--- a/app/controllers/application_controller.rb
++++ b/app/controllers/application_controller.rb
+@@ -1,3 +1,4 @@
++
+ class ApplicationController < ActionController::Base
+   protect_from_forgery
+ 
+diff --git a/app/controllers/sessions_controller.rb b/app/controllers/sessions_controller.rb
+index 8e1a643..835b575 100644
+--- a/app/controllers/sessions_controller.rb
++++ b/app/controllers/sessions_controller.rb
+@@ -14,7 +14,7 @@ class SessionsController < ApplicationController
+       session[:user_id] = @user.id
+       redirect_to root_path, notice: 'You have successful signed in'
+     else
+-      flash[:error] = "Incorrect Username or Password" 
++      flash[:danger] = "Incorrect Username or Password" 
+       render :new     
+     end
+     
+diff --git a/app/controllers/users_controller.rb b/app/controllers/users_controller.rb
+index 39de818..db411dc 100644
+--- a/app/controllers/users_controller.rb
++++ b/app/controllers/users_controller.rb
+@@ -28,6 +28,7 @@ class UsersController < ApplicationController
+   end
+ 
+   def user_params
++
+     params.require(:user).permit(:email_address, :password, :password_confirmation, :full_name)
+   end
+ 
+diff --git a/app/controllers/videos_controller.rb b/app/controllers/videos_controller.rb
+index fe4e848..a200e1c 100644
+--- a/app/controllers/videos_controller.rb
++++ b/app/controllers/videos_controller.rb
+@@ -1,6 +1,7 @@
+ class VideosController < ApplicationController
+ 
+   before_filter :require_user
++  before_action :set_video, only: [:review, :show]
+ 
+   layout "application"
+ 
+@@ -8,17 +9,37 @@ class VideosController < ApplicationController
+     @categories = Category.all
+   end
+ 
+-  def show
+-    @video = Video.find(params[:id])
+-  end
+-
+   def category
+      @category = Category.find(params[:id])
+   end
+ 
++  def show
++    @review = Review.new
++  end
++
+   def search
+     @search_term = params[:search_term]
+     @videos = Video.search_by_title(@search_term)
+   end
+ 
++  def review
++
++    new_review = Review.new(rating: review_params[:rating], comment: review_params[:comment], 
++                            creator: current_user, reviewable: @video)
++
++    new_review.save ? @review = Review.new : @review = new_review
++
++    render :show
++
++  end
++
++  def set_video
++      @video = Video.find(params[:id])
++
++  end
++
++  def review_params
++    params.require(:review).permit(:comment, :rating) 
++  end
++
+ end
+diff --git a/app/models/video.rb b/app/models/video.rb
+index f5ea77d..da427e5 100644
+--- a/app/models/video.rb
++++ b/app/models/video.rb
+@@ -1,3 +1,5 @@
++include ActionView::Helpers::NumberHelper
++
+ class Video < ActiveRecord::Base
+ 
+   belongs_to :category
+@@ -7,6 +9,9 @@ class Video < ActiveRecord::Base
+   # validates :description, presence: true
+ 
+   # Use short hand instaed
++
++  has_many :reviews,  -> { order 'created_at DESC'}, as: :reviewable
++
+   validates_presence_of :title, :description
+ 
+   def self.search_by_title(search_term)
+@@ -17,4 +22,19 @@ class Video < ActiveRecord::Base
+ 
+   end
+ 
++  def average_rating
++
++    size = reviews.count
++
++    return "None" if size == 0
++
++    total = 0.0
++
++    reviews.find_each {|r| total += r.rating}
++
++    average = number_with_precision(total / size, precision: 1)
++
++    "#{average}/5.0"
++  end
++
+ end
+\ No newline at end of file
+diff --git a/app/views/videos/show.html.haml b/app/views/videos/show.html.haml
+index f89f0e5..c44eeb5 100644
+--- a/app/views/videos/show.html.haml
++++ b/app/views/videos/show.html.haml
+@@ -6,7 +6,7 @@
+       .video_info.col-sm-3
+         %header
+           %h3= @video.title
+-          %span Rating: 4.5/5.0
++          %span Rating: #{@video.average_rating}
+         %p= @video.description
+         .actions
+           %a.btn.btn-primary(href="") Watch Now
+@@ -15,34 +15,33 @@
+ %section.reviews.container
+   .row
+     .col-sm-10.col-sm-offset-1
+-      %form
++      = bootstrap_form_for @review, url: review_video_path(@video) do |f|
+         %fieldset
+           .form-group
+-            %label Rate this video
+             .row
+               .col-sm-3
+-                %select.form-control(name="")
++                -# Cannot seem to use options_for_select below
++                = f.select :rating, label: 'Rate this video', class: 'form-control' do
+                   %option(value="5") 5 Stars
+                   %option(value="4") 4 Stars
+                   %option(value="3") 3 Stars
+                   %option(value="2") 2 Stars
+                   %option(value="1") 1 Star
+           .form-group
+-            %label Write Review
+             .row
+               .col-sm-8
+-                %textarea.form-control(name="" rows="6")
++                = f.text_area :comment, label: 'Write Review', rows: 6, class: 'form-control'
+         %fieldset.form-group.actions.clearfix
+-          %input(type="submit" value="Submit" class="btn")
+-          %a(href="") Cancel
++          = f.submit 'Submit', class: 'btn'
++          = link_to 'Cancel', video_path(@video)
+       %header
+-        %h3 User Reviews (253)
++        %h3 User Reviews (#{@video.reviews.count})
+       %ul
+-        - 8.times do
++        - @video.reviews.each do |rev|
+           %article.review
+             %li.row
+               .col-sm-2
+-                %span Rating: 5 / 5
+-                %p by <a href="">John A. Zoidberg</a>
++                %span Rating: #{rev.rating}/5
++                %p by <a href="">#{rev.creator.full_name}</a>
+               .col-sm-8
+-                %p In my opinion, this is one of the best shows ever made. It's not only funny, but despite being so frequently silly, it's very smart as well. Math, science, history, all get referenced. The best parts of the show are the subtle things, those little things in the background or just on screen for a couple of seconds that just make you laugh out loud if you were paying attention. The writers even appear to have been thinking ahead, because if you play close attention to the first episode, you can see a literal shadow of an event revealed seasons later.
++                %p= rev.comment
+diff --git a/config/routes.rb b/config/routes.rb
+index a3cd3b6..d71b293 100644
+--- a/config/routes.rb
++++ b/config/routes.rb
+@@ -7,6 +7,10 @@ Myflix::Application.routes.draw do
+     collection do
+       get :search
+     end
++
++    member do
++      post :review
++    end
+   end
+ 
+   resources :users, only: [:new, :create]
+diff --git a/db/schema.rb b/db/schema.rb
+index a5b64d0..91458f1 100644
+--- a/db/schema.rb
++++ b/db/schema.rb
+@@ -11,7 +11,7 @@
+ #
+ # It's strongly recommended that you check this file into your version control system.
+ 
+-ActiveRecord::Schema.define(version: 20140907192746) do
++ActiveRecord::Schema.define(version: 20140912160908) do
+ 
+   create_table "categories", force: true do |t|
+     t.string   "name"
+@@ -19,6 +19,16 @@ ActiveRecord::Schema.define(version: 20140907192746) do
+     t.datetime "updated_at"
+   end
+ 
++  create_table "reviews", force: true do |t|
++    t.text     "comment"
++    t.integer  "rating"
++    t.integer  "user_id"
++    t.string   "reviewable_type"
++    t.integer  "reviewable_id"
++    t.datetime "created_at"
++    t.datetime "updated_at"
++  end
++
+   create_table "users", force: true do |t|
+     t.string   "email_address"
+     t.string   "full_name"
+diff --git a/spec/models/category_spec.rb b/spec/models/category_spec.rb
+index 3ecda58..ab6a338 100644
+--- a/spec/models/category_spec.rb
++++ b/spec/models/category_spec.rb
+@@ -19,7 +19,7 @@ describe Category do
+   
+   it {should have_many(:videos)}
+ 
+-  describe "recent_videos" do
++  describe "#recent_videos" do
+ 
+     it "returns recent videos with most recent first" do
+ 
+diff --git a/spec/models/video_spec.rb b/spec/models/video_spec.rb
+index 55a6682..dbe54c3 100644
+--- a/spec/models/video_spec.rb
++++ b/spec/models/video_spec.rb
+@@ -42,47 +42,57 @@ describe Video do
+   #end
+ 
+   it {should belong_to(:category)}
++  it {should have_many(:reviews).order("created_at DESC")}
+   it {should validate_presence_of(:title)}
+-  it {should validate_presence_of(:description)}  
++  it {should validate_presence_of(:description)}
+ 
+   describe "#search_by_title" do
++    before do
++      @futurama = Video.create(title: 'Futurama', description: 'Space adventure')
++      @back_to_future = Video.create(title: 'Back to the Future', description: 'Time travel!')
++    end
+ 
+     it "returns empty array on search on no match" do
+-      futurama = Video.create(title: 'Futurama', description: 'Space adventure')
+-      back_to_future = Video.create(title: 'Back to the Future', description: 'Time travel!')
+-
+       expect(Video.search_by_title('random')).to eq([])
+     end
+ 
+     it "returns 1 array item on exact match" do
+-      futurama = Video.create(title: 'Futurama', description: 'Space adventure')
+-      back_to_future = Video.create(title: 'Back to the Future', description: 'Time travel!')
+-
+-      expect(Video.search_by_title('Futurama')).to eq([futurama])
++      expect(Video.search_by_title('Futurama')).to eq([@futurama])
+     end
+ 
+     it "returns 1 array item on partial match" do
+-      futurama = Video.create(title: 'Futurama', description: 'Space adventure')
+-      back_to_future = Video.create(title: 'Back to the Future', description: 'Time travel!')
+-
+-      expect(Video.search_by_title('rama')).to eq([futurama])
++      expect(Video.search_by_title('rama')).to eq([@futurama])
+     end
+ 
+-
+     it "returns many array items on partial match ordered by created_at" do
+-      futurama = Video.create(title: 'Futurama', description: 'Space adventure')
+-      back_to_future = Video.create(title: 'Back to the Future', description: 'Time travel!', created_at: 1.day.ago)
++      south_park  = Video.create(title: 'South Park', description: 'Funny animated!')
++      south_park_2 = Video.create(title: 'South Park 2', description: 'Funny animated!', created_at: 1.day.ago)
+ 
+-      expect(Video.search_by_title('Futur')).to eq([futurama, back_to_future])
++      expect(Video.search_by_title('South')).to eq([south_park, south_park_2])
+     end
+ 
+     it "returns empty array on empty search string" do
+-      futurama = Video.create(title: 'Futurama', description: 'Space adventure')
+-      back_to_future = Video.create(title: 'Back to the Future', description: 'Time travel!')
+-
+       expect(Video.search_by_title('')).to eq([])
+     end
++  end
++end
+ 
++describe "#average_rating" do
++  it "returns rating 'None' if no reviews" do
++    futurama = Video.create(title: 'Futurama', description: 'Space adventure')
++    expect(futurama.average_rating).to eq('None')
+   end
+ 
++  it "returns rating '3.0/5.0' for multiple reviews with rating 3" do
++    video = Fabricate(:video)
++    user = Fabricate(:user)
++
++    20.times do
++      Fabricate(:review, user_id: user.id, video_id: video.id)
++    end
++
++    expect(video.average_rating).to eq('3.0/5.0')
++  end
+ end
++
++
