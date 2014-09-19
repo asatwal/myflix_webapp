@@ -1,6 +1,6 @@
 class Review < ActiveRecord::Base
 
-  belongs_to :creator,  foreign_key: 'user_id', class_name: 'User'
+  belongs_to :user
 
   belongs_to :reviewable, polymorphic: true
 

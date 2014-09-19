@@ -25,7 +25,7 @@ class VideosController < ApplicationController
   def review
 
     new_review = Review.new(rating: review_params[:rating], comment: review_params[:comment], 
-                            creator: current_user, reviewable: @video)
+                            user: current_user, reviewable: @video)
 
     new_review.save ? @review = Review.new : @review = new_review
 

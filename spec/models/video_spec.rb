@@ -88,7 +88,7 @@ describe "#average_rating" do
     user = Fabricate(:user)
 
     20.times do
-      Fabricate(:review, user_id: user.id, video_id: video.id)
+      Fabricate(:review, rating: 3, user: user, reviewable: video)
     end
 
     expect(video.average_rating).to eq('3.0/5.0')

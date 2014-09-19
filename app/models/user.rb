@@ -12,6 +12,7 @@ class User < ActiveRecord::Base
 
   validates :password, confirmation: true, unless: :password_fields_blank?
 
+  has_many :queue_items, -> {order 'position ASC'}
 
   def password_fields_blank?
     password.blank? && password_confirmation.blank?

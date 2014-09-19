@@ -9,7 +9,8 @@ class ApplicationController < ActionController::Base
   end
 
   def current_user
-    User.find(session[:user_id]) if session[:user_id]
+    # Use find_by rather than just find as it will return ActiveRecord::RecordNotFound if no rows that has to be handled
+    user = User.find_by(id: session[:user_id]) if session[:user_id]
   end
 
 end

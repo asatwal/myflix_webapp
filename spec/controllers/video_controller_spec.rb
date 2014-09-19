@@ -8,34 +8,34 @@ describe VideosController do
 
     context "with authenticated user" do
       let(:current_user) {Fabricate(:user)}
+      let(:video) {Fabricate(:video)}
       before do
         session[:user_id] = current_user.id
-        @video = Fabricate(:video)
       end
 
       it "retrieves @video" do
-        get :show, id: @video.id
-        expect(assigns(:video)).to eq(@video)
+        get :show, id: video.id
+        expect(assigns(:video)).to eq(video)
       end
 
       it "sets @review" do
-        get :show, id: @video.id
+        get :show, id: video.id
         expect(assigns(:review)).to be_instance_of(Review)
       end
 
       it "retrieves all the reviews created" do
         21.times do
-          Fabricate(:review, user_id: session[:user_id], video_id: @video.id)
+          Fabricate(:review, user: current_user, reviewable: video)
         end
-        get :show, id: @video.id
+        get :show, id: video.id
         expect(assigns(:video).reviews.count).to eq(21)
       end
 
       it "retrieves all the reviews ordered by latest first" do
-        review2 = Fabricate(:review, user_id: current_user.id, video_id: @video.id)
-        review1 = Fabricate(:review, user_id: current_user.id, video_id: @video.id, created_at: 1.day.ago)
+        review2 = Fabricate(:review, user: current_user, reviewable: video)
+        review1 = Fabricate(:review, user: current_user, reviewable: video, created_at: 1.day.ago)
 
-        get :show, id: @video.id
+        get :show, id: video.id
         expect(assigns(:video).reviews).to eq([review2, review1])
       end
 
@@ -79,48 +79,49 @@ describe VideosController do
 
     context "with authenticated user and valid inputs" do
       let(:current_user) {Fabricate(:user)}
+      let(:video) {Fabricate(:video)}
+      let(:review_attrs) {Fabricate.attributes_for(:review, user: current_user, reviewable: video)}
       before do
         session[:user_id] = current_user.id
-        @video = Fabricate(:video)
       end
 
       it "retrieves @video" do
-        post :review, id: @video.id, review: Fabricate.attributes_for(:review)
-        expect(assigns(:video)).to eq(@video)
+        post :review, id: video.id, review: review_attrs
+        expect(assigns(:video)).to eq(video)
       end
 
       it "retrieves a Review object" do
-        post :review, id: @video.id, review: Fabricate.attributes_for(:review)
+        post :review, id: video.id, review: review_attrs
         expect(assigns(:review)).to be_instance_of(Review)
       end
 
       it "sets @review to new record" do
-        post :review, id: @video.id, review: Fabricate.attributes_for(:review)
+        post :review, id: video.id, review: review_attrs
         expect(assigns(:review).new_record?).to be true
       end
 
       it "@review has no errors" do
-        post :review, id: @video.id, review: Fabricate.attributes_for(:review)
+        post :review, id: video.id, review: review_attrs
         expect(assigns(:review).errors.size).to be 0
       end
 
       it "saves review" do
-        post :review, id: @video.id, review: Fabricate.attributes_for(:review)
+        post :review, id: video.id, review: review_attrs
         expect(Review.all.size).to eq(1)
       end
 
       it "saves review associated to video" do
-        post :review, id: @video.id, review: Fabricate.attributes_for(:review)
-        expect(Review.all.first).to eq(@video.reviews.first)
+        post :review, id: video.id, review: review_attrs
+        expect(Review.all.first).to eq(video.reviews.first)
       end
 
       it "saves review for current user" do
-        post :review, id: @video.id, review: Fabricate.attributes_for(:review)
+        post :review, id: video.id, review: review_attrs
         expect(Review.first.user_id).to eq(current_user.id)
       end
 
       it "renders template show" do
-        post :review, id: @video.id, review: Fabricate.attributes_for(:review)
+        post :review, id: video.id, review: review_attrs
         expect(response).to render_template :show
       end
     end
@@ -168,8 +169,10 @@ describe VideosController do
 
     context "with unauthenticated user" do
       it "redirects to front_path for unauthenticated user" do
+        user = Fabricate(:user)
         video = Fabricate(:video)
-        post :review, id: video.id, review: Fabricate.attributes_for(:review)
+        review_attrs = Fabricate.attributes_for(:review, user: user, reviewable: video)
+        post :review, id: video.id, review: review_attrs
 
         expect(response).to redirect_to front_path
       end
