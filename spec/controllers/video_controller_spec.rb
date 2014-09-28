@@ -7,11 +7,8 @@ describe VideosController do
     # WITH CONTEXT FOR AUTHENICATED USER
 
     context "with authenticated user" do
-      let(:current_user) {Fabricate(:user)}
       let(:video) {Fabricate(:video)}
-      before do
-        session[:user_id] = current_user.id
-      end
+      before { set_current_user}
 
       it "retrieves @video" do
         get :show, id: video.id
@@ -42,21 +39,19 @@ describe VideosController do
       # No need to test - renders show template as this is Rails functionality
     end
 
-    context "with unauthenticated user" do
-      it "redirects to front_path for unauthenticated user" do
+    it_behaves_like "with unauthenticated user" do
+      let(:action) do
         video = Fabricate(:video)
         get :show, id: video.id
-        expect(response).to redirect_to front_path
       end
-    end
-
+    end 
   end
 
     # WITHOUT CONTEXT FOR AUTHENICATED USER - FLATTER STRUCTURE
 
   describe "GET search" do
     it "retrieves @video by search term authenticated user" do
-      session[:user_id] = Fabricate(:user).id
+      set_current_user
 
       video = Fabricate(:video, title: 'Grange Hill')
       get :search, search_term: 'Hill'
@@ -65,11 +60,12 @@ describe VideosController do
 
     # No need to test - renders search template as this is Rails functionality
 
-    it "redirects to front_path for unauthenticated user" do
-      video = Fabricate(:video, title: 'Futurama')
-      get :search, search_term: 'rama'
-      expect(response).to redirect_to front_path     
-    end
+    it_behaves_like "with unauthenticated user" do
+      let(:action) do
+        video = Fabricate(:video, title: 'Futurama')
+        get :search, search_term: 'rama'
+      end
+    end 
   end
 
 
@@ -78,12 +74,9 @@ describe VideosController do
     # WITH CONTEXT FOR AUTHENICATED USER
 
     context "with authenticated user and valid inputs" do
-      let(:current_user) {Fabricate(:user)}
       let(:video) {Fabricate(:video)}
       let(:review_attrs) {Fabricate.attributes_for(:review, user: current_user, reviewable: video)}
-      before do
-        session[:user_id] = current_user.id
-      end
+      before { set_current_user}
 
       it "retrieves @video" do
         post :review, id: video.id, review: review_attrs
@@ -128,9 +121,8 @@ describe VideosController do
 
 
     context "with authenticated user and invalid inputs" do
-      let(:current_user) {Fabricate(:user)}
       before do
-        session[:user_id] = current_user.id
+        set_current_user
         @video = Fabricate(:video)
       end
 
@@ -166,18 +158,14 @@ describe VideosController do
       end
     end
 
-
-    context "with unauthenticated user" do
-      it "redirects to front_path for unauthenticated user" do
+    it_behaves_like "with unauthenticated user" do
+      let(:action) do
         user = Fabricate(:user)
         video = Fabricate(:video)
         review_attrs = Fabricate.attributes_for(:review, user: user, reviewable: video)
         post :review, id: video.id, review: review_attrs
-
-        expect(response).to redirect_to front_path
       end
     end
-
   end
-
 end
+

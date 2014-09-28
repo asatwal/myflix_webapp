@@ -12,6 +12,8 @@ class Video < ActiveRecord::Base
 
   has_many :reviews,  -> { order 'created_at DESC'}, as: :reviewable
 
+  has_many :queue_items
+
   validates_presence_of :title, :description
 
   def self.search_by_title(search_term)
@@ -24,13 +26,17 @@ class Video < ActiveRecord::Base
 
   def average_rating
 
-    size = reviews.count
+    total = 0.0
+    size = 0
+
+    reviews.find_each do |review|
+      if review.rating
+        total += review.rating 
+        size += 1 # There is no pre or post increment operator in Ruby
+      end
+    end
 
     return "None" if size == 0
-
-    total = 0.0
-
-    reviews.find_each {|r| total += r.rating}
 
     average = number_with_precision(total / size, precision: 1)
 

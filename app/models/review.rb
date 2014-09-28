@@ -6,7 +6,6 @@ class Review < ActiveRecord::Base
 
   # validates_uniqueness_of :creator, scope: [:reviewable_id, :reviewable_type]
 
-  validates_presence_of :comment, :rating
-
+  validates_presence_of :rating, :comment
 end
 

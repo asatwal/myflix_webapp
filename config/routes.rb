@@ -24,6 +24,7 @@ Myflix::Application.routes.draw do
   get 'videos/category/:id', to: 'videos#category', as: :category
 
   get 'my_queue', to: 'queue_items#index'
+  post 'update_queue', to: 'queue_items#update_queue'
 
   resources :queue_items, only: [:create, :destroy]
 

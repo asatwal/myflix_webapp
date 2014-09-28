@@ -5,7 +5,7 @@ describe SessionsController do
   describe "GET new" do
 
     it "redirects to root_path for authenticated user" do
-      session[:user_id] = Fabricate(:user).id
+      set_current_user
       get :new
       expect(response).to redirect_to root_path     
     end
@@ -20,14 +20,14 @@ describe SessionsController do
   describe "POST create" do
 
     context "with correct valid user inputs" do
+      let(:current_user) { Fabricate(:user) }
 
       before do
-        @user = Fabricate(:user)
-        post :create, email_address: @user.email_address, password: @user.password
+        post :create, email_address: current_user.email_address, password: current_user.password
       end
 
       it "sets user_id in session" do
-        expect(session[:user_id]).to eq(@user.id) 
+        expect(session[:user_id]).to eq(current_user.id) 
       end
 
       it "redirects to root_path" do
@@ -40,10 +40,10 @@ describe SessionsController do
     end
 
     context "with correct invalid user inputs" do
+      let(:current_user) { Fabricate(:user) }
 
       before do
-        user = Fabricate(:user)
-        post :create, email_address: user.email_address, password: Faker::Internet.password
+        post :create, email_address: current_user.email_address, password: Faker::Internet.password
       end
 
       it "user_id in session is nil" do
@@ -71,7 +71,7 @@ describe SessionsController do
 
   describe "GET destroy" do
     before do
-      session[:user_id] = Fabricate(:user).id
+      set_current_user
       get :destroy
     end
 

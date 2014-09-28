@@ -18,4 +18,11 @@ class User < ActiveRecord::Base
     password.blank? && password_confirmation.blank?
   end
 
+
+  def renumber_queue_items
+    queue_items.each_with_index do |queue_item, index|
+       queue_item.update_attributes(position: index + 1) 
+    end
+  end
+
 end
