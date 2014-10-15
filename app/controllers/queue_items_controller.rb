@@ -1,8 +1,5 @@
-require 'pry'
 
 class QueueItemsController < ApplicationController
-
-  layout "application"
 
   before_action :require_user
 

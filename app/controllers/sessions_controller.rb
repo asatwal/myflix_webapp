@@ -1,7 +1,5 @@
 class SessionsController < ApplicationController
 
-  layout "application"
-
   def new
     redirect_to root_path if current_user
   end

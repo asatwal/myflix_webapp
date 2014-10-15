@@ -1,6 +1,8 @@
 class User < ActiveRecord::Base
 
-  validates_presence_of :email_address, :full_name
+  before_validation :generate_token, on: :create
+
+  validates_presence_of :email_address, :full_name, :token
 
   validates_uniqueness_of :email_address
 
@@ -14,6 +16,12 @@ class User < ActiveRecord::Base
 
   has_many :queue_items, -> {order 'position ASC'}
 
+  has_many :reviews, -> {order 'created_at DESC'}
+
+  has_many :following_rels, class_name: 'Relationship', foreign_key: :follower_id
+
+  has_many :leading_rels, class_name: 'Relationship', foreign_key: :leader_id
+
   def password_fields_blank?
     password.blank? && password_confirmation.blank?
   end
@@ -23,6 +31,19 @@ class User < ActiveRecord::Base
     queue_items.each_with_index do |queue_item, index|
        queue_item.update_attributes(position: index + 1) 
     end
+  end
+
+  def follows? other_user
+    following_rels.map(&:leader_id).include?(other_user.id)
+  end
+
+  def can_follow? other_user
+    !(self == other_user || follows?(other_user))
+  end
+
+
+  def generate_token
+    self.token = SecureRandom.urlsafe_base64
   end
 
 end

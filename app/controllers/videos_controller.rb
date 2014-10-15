@@ -3,7 +3,6 @@ class VideosController < ApplicationController
   before_filter :require_user
   before_action :set_video, only: [:review, :show]
 
-  layout "application"
 
   def index
     @categories = Category.all
