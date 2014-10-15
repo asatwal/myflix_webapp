@@ -23,10 +23,9 @@ class ResetPasswordsController < ApplicationController
 
       if user.save
         redirect_to sign_in_path, notice: 'Your password has been reset. Please sign in'
-        return
       else
-        flash[:danger] = user.errors.full_messages.join('. ')
         @token = params[:token]
+        flash[:danger] = user.errors.full_messages.join('. ')
         render :show
       end
 

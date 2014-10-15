@@ -1,6 +1,5 @@
 class UsersController < ApplicationController
 
-  layout "application"
 
   before_action :require_user, only: [:show]
 

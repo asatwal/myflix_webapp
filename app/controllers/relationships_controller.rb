@@ -1,6 +1,5 @@
 class RelationshipsController < ApplicationController
 
-  layout "application"
 
   before_action :require_user
 
