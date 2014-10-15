@@ -13,13 +13,15 @@ Myflix::Application.routes.draw do
     end
   end
 
-  resources :users, only: [:new, :create]
+  resources :users, only: [:new, :create, :show]
 
   get 'sign_in', to: 'sessions#new'
   post 'sign_in', to: 'sessions#create'
   get 'sign_out', to: 'sessions#destroy'
 
   get 'front', to: 'pages#front'
+  get 'confirm_password_reset', to: 'pages#confirm_password_reset'
+  get 'invalid_token', to: 'pages#invalid_token'
 
   get 'videos/category/:id', to: 'videos#category', as: :category
 
@@ -29,5 +31,15 @@ Myflix::Application.routes.draw do
   resources :queue_items, only: [:create, :destroy]
 
   get 'ui(/:action)', controller: 'ui'
+
+  get 'people', to: 'relationships#index'
+
+  resources :relationships, only: [:create, :destroy]
+
+  # Must pluralise otherwise get _index in the path
+
+  resources :forgot_passwords, only: [:new, :create]
+
+  resources :reset_passwords, only: [:show, :create]
 
 end

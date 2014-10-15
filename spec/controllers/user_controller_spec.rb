@@ -65,4 +65,64 @@ describe UsersController do
       end
     end
   end
+
+
+  describe "GET show" do
+    let(:bob) {Fabricate(:user, email_address: "bob@bob.com")}
+
+    it "sets @user for authenticated user" do
+      set_current_user
+      get :show, id: bob.id
+      expect(assigns(:user)).to eq(bob)
+    end
+
+    it "redirects to root_path for unauthenticated user" do
+      get :show, id: bob.id
+      expect(response).to redirect_to front_path     
+    end
+  end
+
+  describe "SEND email on new user" do
+
+    # As the mail sending is not part os the database transaction 
+    # it is not cleared from database
+
+    after {ActionMailer::Base.deliveries.clear}
+
+    it "sends email" do
+      user_attrs = Fabricate.attributes_for(:user)
+      post :create, user: user_attrs
+      ActionMailer::Base.deliveries.should_not be_empty
+    end
+
+    it "sends email to correct recipient" do
+      user_attrs = Fabricate.attributes_for(:user)
+      post :create, user: user_attrs
+      message = ActionMailer::Base.deliveries.last
+      message.to.should eq [user_attrs[:email_address]] 
+    end
+
+    it "sends email with correct Subject" do
+      user_attrs = Fabricate.attributes_for(:user)
+      post :create, user: user_attrs
+      message = ActionMailer::Base.deliveries.last
+      message.subject.should eq "Welcome to MyFlix" 
+    end
+
+    it "sends email with correct content" do
+      user_attrs = Fabricate.attributes_for(:user)
+      post :create, user: user_attrs
+      message = ActionMailer::Base.deliveries.last
+      message.body.should include user_attrs[:full_name] 
+    end
+
+    it "does not send email on invalid input" do
+      user_attrs = Fabricate.attributes_for(:user)
+      post :create, user: {email_address: 'bob@email.com'}
+      ActionMailer::Base.deliveries.should be_empty
+    end
+
+  end
+
 end
+

@@ -2,6 +2,8 @@ class UsersController < ApplicationController
 
   layout "application"
 
+  before_action :require_user, only: [:show]
+
   def new
     redirect_to root_path if current_user
 
@@ -15,6 +17,8 @@ class UsersController < ApplicationController
 
     if @user.save
 
+      AppMailer.register_email(@user).deliver
+
       flash[:notice] = "New user #{@user.full_name} created"
 
       # Save user to session as this indicates user logged in
@@ -25,6 +29,10 @@ class UsersController < ApplicationController
       render :new
     end
     
+  end
+
+  def show
+    @user = User.find(params[:id])
   end
 
   def user_params
