@@ -25,6 +25,7 @@ feature "User follow interactions " do
     # save_and_open_page
     page.should_not have_content("#{bob.full_name}")
 
+    clear_email
 
   end
 

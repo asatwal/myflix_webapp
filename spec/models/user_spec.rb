@@ -9,7 +9,6 @@ describe User do
   it {should have_secure_password}
 
   it {should validate_presence_of(:password)}
-  it {should validate_presence_of(:full_name)}
   it {should ensure_length_of(:password).is_at_least(5)}
   it {should validate_confirmation_of(:password)}
 
@@ -17,6 +16,7 @@ describe User do
   it {should have_many(:reviews).order('created_at DESC')}
   it {should have_many(:following_rels)}
   it {should have_many(:leading_rels)}
+  it {should have_many(:invitations).with_foreign_key(:inviter_id)}
 
 
   describe "#password_fields_blank" do
@@ -26,12 +26,9 @@ describe User do
     end
   end
 
-  describe "#generate_token" do
-    it "confirm a token is generated" do
-      user = Fabricate(:user)
-      expect(user.token).not_to be_empty
-    end
-  end
+  it_behaves_like "Tokenable" do
+    let(:object) {Fabricate(:user)}
+  end 
 
   it "gets queue items ordered by position" do
     current_user = Fabricate(:user)
@@ -83,6 +80,21 @@ describe User do
       hari = Fabricate(:user, email_address: 'hari@hari.com')
       Fabricate(:relationship, leader: hari, follower: san)
       expect(hari.can_follow?(hari)).to be false
+    end
+  end
+
+  describe "#follow" do
+    it "sets given user as follower" do
+      san = Fabricate(:user, email_address: 'san@san.com')
+      hari = Fabricate(:user, email_address: 'hari@hari.com')
+      hari.follow(san)
+      expect(hari.follows?(san)).to be true
+    end
+
+    it "user cannot follow oneself" do
+      san = Fabricate(:user, email_address: 'san@san.com')
+      san.follow(san)
+      expect(san.follows?(san)).to be false
     end
   end
 

@@ -32,6 +32,8 @@ feature "User interacts with the queue" do
     expect_video_position(south_park,1)
     expect_video_position(futurama,2)
 
+    clear_email
+
   end
 
 

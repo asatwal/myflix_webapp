@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-ruby '2.1.1'
+ruby '2.1.4'
 
 gem 'bootstrap-sass'
 gem 'coffee-rails'
@@ -10,6 +10,7 @@ gem 'uglifier'
 gem 'jquery-rails'
 gem 'bcrypt'
 gem 'bootstrap_form'
+gem 'figaro'
 
 group :development do
   gem 'sqlite3'
@@ -32,6 +33,7 @@ group :test do
   gem 'faker'
   gem 'capybara'
   gem 'launchy'
+  gem 'capybara-email'
 end
 
 group :production do

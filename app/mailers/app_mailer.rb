@@ -15,4 +15,12 @@ class AppMailer < ActionMailer::Base
     mail from: 'myflix@e-eworx.co.uk', to: user.email_address, subject: 'Reset Password'
     
   end
+
+  def invitation_email invitation
+
+    @invitation = invitation
+
+    mail from: 'myflix@e-eworx.co.uk', to: invitation.email_address, subject: 'Invitation to Join MyFlix'
+  end
+
 end

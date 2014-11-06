@@ -1,0 +1,15 @@
+!!! 5
+%html(lang="en-US")
+  %head
+    %br
+  %body
+  %p
+    Dear #{@invitation.full_name}, </br></br>
+    #{@invitation.inviter.full_name} has invited you to join MyFlix. </br>
+    They have sent to you this message: </br>
+    #{@invitation.message} </br>
+    Please find link below to register.</br></br>
+    = link_to "Click here to accept invitation", new_invited_user_url(token: @invitation.token), method: :get
+    </br></br>
+    Regards, </br></br>  
+    The MyFlix Team
