@@ -15,6 +15,8 @@ Myflix::Application.routes.draw do
 
   resources :users, only: [:new, :create, :show]
 
+  get 'users/new_invited/:token', to: 'users#new_invited', as: 'new_invited_user'
+
   get 'sign_in', to: 'sessions#new'
   post 'sign_in', to: 'sessions#create'
   get 'sign_out', to: 'sessions#destroy'
@@ -41,5 +43,7 @@ Myflix::Application.routes.draw do
   resources :forgot_passwords, only: [:new, :create]
 
   resources :reset_passwords, only: [:show, :create]
+
+  resources :invitations, only: [:new, :create]
 
 end

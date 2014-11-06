@@ -2,6 +2,8 @@ require 'spec_helper'
 
 describe UsersController do
 
+  let(:invitation) {Fabricate(:invitation, inviter: Fabricate(:user))}
+
   describe "GET new" do
 
     it "sets @user" do
@@ -18,6 +20,36 @@ describe UsersController do
     it "renders new template for unauthenticated user" do
       get :new
       expect(response).to render_template :new
+    end
+
+  end
+
+  describe "GET new_invited" do
+
+    it "redirects to root_path for authenticated user" do
+      set_current_user
+      get :new_invited, token: 'xxx'
+      expect(response).to redirect_to root_path     
+    end
+
+    it "finds invitee with token" do
+      get :new_invited, token: invitation.token
+      expect(assigns(:invitation_token)).to eq(invitation.token)
+    end
+
+    it "renders new template for invitee with token" do
+      get :new_invited, token: invitation.token
+      expect(response).to render_template :new     
+    end
+
+    it "pre fills email for invitee with token" do
+      get :new_invited, token: invitation.token
+      expect(assigns(:user).email_address).to eq(invitation.email_address)
+    end
+
+    it "redirects to link expired page for invalid token" do
+      get :new_invited, token: 'xxx'
+      expect(response).to redirect_to invalid_token_path     
     end
 
   end
@@ -41,6 +73,24 @@ describe UsersController do
         user_attrs = Fabricate.attributes_for(:user)
         post :create, user: user_attrs
         expect(session[:user_id]).to eq(User.find_by(email_address: user_attrs[:email_address]).id)
+      end
+
+      it "sets the inviter as follower of invitee if token exists" do
+        user_attrs = Fabricate.attributes_for(:user, email_address: invitation.email_address)
+        post :create, user: user_attrs, invitation_token: invitation.token
+        expect(invitation.inviter.follows?assigns(:user)).to be true
+      end
+
+      it "sets the invitee as follower of inviter if token exists" do
+        user_attrs = Fabricate.attributes_for(:user, email_address: invitation.email_address)
+        post :create, user: user_attrs, invitation_token: invitation.token
+        expect(assigns(:user).follows?invitation.inviter).to be true
+      end
+
+      it "clears invitation token" do
+        user_attrs = Fabricate.attributes_for(:user, email_address: invitation.email_address)
+        post :create, user: user_attrs, invitation_token: invitation.token
+        expect(Invitation.find_by(email_address: invitation.email_address).token).to be_nil
       end
     end
 

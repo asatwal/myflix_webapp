@@ -1,6 +1,6 @@
 class User < ActiveRecord::Base
 
-  before_validation :generate_token, on: :create
+  include Tokenable
 
   validates_presence_of :email_address, :full_name, :token
 
@@ -22,6 +22,8 @@ class User < ActiveRecord::Base
 
   has_many :leading_rels, class_name: 'Relationship', foreign_key: :leader_id
 
+  has_many :invitations, foreign_key: :inviter_id
+
   def password_fields_blank?
     password.blank? && password_confirmation.blank?
   end
@@ -41,9 +43,8 @@ class User < ActiveRecord::Base
     !(self == other_user || follows?(other_user))
   end
 
-
-  def generate_token
-    self.token = SecureRandom.urlsafe_base64
+  def follow other_user
+    following_rels.create(leader: other_user) if can_follow?other_user
   end
 
 end
