@@ -11,6 +11,11 @@ gem 'jquery-rails'
 gem 'bcrypt'
 gem 'bootstrap_form'
 gem 'figaro'
+gem 'sidekiq'
+gem 'sinatra', require: false
+gem 'slim'
+gem 'unicorn'
+gem 'foreman'
 
 group :development do
   gem 'sqlite3'
