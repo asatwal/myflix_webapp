@@ -4,7 +4,7 @@ class AppMailer < ActionMailer::Base
 
     @user = user
 
-    mail from: 'myflix@e-eworx.co.uk', to: user.email_address, subject: 'Welcome to MyFlix'
+    mail from: 'myflix@e-worx.co.uk', to: user.email_address, subject: 'Welcome to MyFlix'
     
   end
 
@@ -12,7 +12,7 @@ class AppMailer < ActionMailer::Base
 
     @user = user
 
-    mail from: 'myflix@e-eworx.co.uk', to: user.email_address, subject: 'Reset Password'
+    mail from: 'myflix@e-worx.co.uk', to: user.email_address, subject: 'Reset Password'
     
   end
 
@@ -20,7 +20,7 @@ class AppMailer < ActionMailer::Base
 
     @invitation = invitation
 
-    mail from: 'myflix@e-eworx.co.uk', to: invitation.email_address, subject: 'Invitation to Join MyFlix'
+    mail from: 'myflix@e-worx.co.uk', to: invitation.email_address, subject: 'Invitation to Join MyFlix'
   end
 
 end
