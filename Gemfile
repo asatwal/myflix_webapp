@@ -16,6 +16,7 @@ gem 'sinatra', require: false
 gem 'slim'
 gem 'unicorn'
 gem 'foreman'
+gem 'paratrooper'
 
 group :development do
   gem 'sqlite3'
