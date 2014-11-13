@@ -11,6 +11,12 @@ gem 'jquery-rails'
 gem 'bcrypt'
 gem 'bootstrap_form'
 gem 'figaro'
+gem 'sidekiq'
+gem 'sinatra', require: false
+gem 'slim'
+gem 'unicorn'
+gem 'foreman'
+gem 'paratrooper'
 
 group :development do
   gem 'sqlite3'
@@ -39,5 +45,6 @@ end
 group :production do
   gem 'pg'
   gem 'rails_12factor'
+  gem 'sentry-raven', :git => 'https://github.com/getsentry/raven-ruby.git'
 end
 

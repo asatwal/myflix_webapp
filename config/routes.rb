@@ -1,3 +1,5 @@
+require 'sidekiq/web'
+
 Myflix::Application.routes.draw do
 
   root to: 'videos#index'
@@ -45,5 +47,7 @@ Myflix::Application.routes.draw do
   resources :reset_passwords, only: [:show, :create]
 
   resources :invitations, only: [:new, :create]
+
+  mount Sidekiq::Web, at: '/sidekiq'
 
 end
