@@ -15,6 +15,10 @@ Myflix::Application.routes.draw do
     end
   end
 
+  namespace :admin do
+    resources :videos, only: [:new, :create]
+  end
+
   resources :users, only: [:new, :create, :show]
 
   get 'users/new_invited/:token', to: 'users#new_invited', as: 'new_invited_user'

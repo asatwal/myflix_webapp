@@ -8,15 +8,18 @@ gem 'haml-rails'
 gem 'sass-rails'
 gem 'uglifier'
 gem 'jquery-rails'
-gem 'bcrypt'
-gem 'bootstrap_form'
-gem 'figaro'
-gem 'sidekiq'
+gem 'bcrypt'                       # Authenticating users and hold encrypted passwords
+gem 'bootstrap_form'               # Forms that handle displaying of errors back to user
+gem 'figaro'                       # Environment variable management
+gem 'sidekiq'                      # Processing of background jobs
 gem 'sinatra', require: false
 gem 'slim'
-gem 'unicorn'
-gem 'foreman'
-gem 'paratrooper'
+gem 'unicorn'                      # Muti-threaded Ruby server
+gem 'foreman'                      # To start prcesses based on Procfile on heroku
+gem 'paratrooper'                  # Easy deployment to heroku with rake tasks
+
+gem 'carrierwave'                  # Uploaded files
+gem 'mini_magick'                  # Image processing
 
 group :development do
   gem 'sqlite3'

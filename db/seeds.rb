@@ -16,39 +16,39 @@ aatwal = User.create(email_address: 'aatwal', full_name: 'Amarjit Atwal', passwo
 
 
 Video.create(title: 'Family Guy', description: 'About a Family Guy', 
-             small_cover_url: '/tmp/family_guy.jpg', large_cover_url: '/tmp/family_guy.jpg', category: comedies)
+             small_cover: '/tmp/family_guy.jpg', large_cover: '/tmp/family_guy.jpg', category: comedies)
 
 Video.create(title: 'Futurama', description: 'About the Future', 
-             small_cover_url: '/tmp/futurama.jpg', large_cover_url: '/tmp/futurama.jpg', category: comedies)
+             small_cover: '/tmp/futurama.jpg', large_cover: '/tmp/futurama.jpg', category: comedies)
 
 
 Video.create(title: 'Family Guy', description: 'About a Family Guy', 
-             small_cover_url: '/tmp/family_guy.jpg', large_cover_url: '/tmp/family_guy.jpg', category: comedies)
+             small_cover: '/tmp/family_guy.jpg', large_cover: '/tmp/family_guy.jpg', category: comedies)
 
 Video.create(title: 'Futurama', description: 'About the Future', 
-             small_cover_url: '/tmp/futurama.jpg', large_cover_url: '/tmp/futurama.jpg', category: comedies)
+             small_cover: '/tmp/futurama.jpg', large_cover: '/tmp/futurama.jpg', category: comedies)
 
 
 Video.create(title: 'Monk', description: 'About a monk', 
-             small_cover_url: '/tmp/monk.jpg', large_cover_url: '/tmp/monk_large.jpg', category: comedies)
+             small_cover: '/tmp/monk.jpg', large_cover: '/tmp/monk_large.jpg', category: comedies)
 
 
 south_park = Video.create(title: 'South Park', description: "Animated comedy from the 1990's", 
-             small_cover_url: '/tmp/south_park.jpg', large_cover_url: '/tmp/south_park.jpg', category: comedies)
+             small_cover: '/tmp/south_park.jpg', large_cover: '/tmp/south_park.jpg', category: comedies)
 
 
 monk = Video.create(title: 'Monk', description: 'About a monk', 
-                    small_cover_url: '/tmp/monk.jpg', large_cover_url: '/tmp/monk_large.jpg', category: comedies)
+                    small_cover: '/tmp/monk.jpg', large_cover: '/tmp/monk_large.jpg', category: comedies)
 
 
 
 Video.create(title: 'Monk', description: 'About a monk', 
-             small_cover_url: '/tmp/monk.jpg', large_cover_url: '/tmp/monk_large.jpg', category: dramas)
+             small_cover: '/tmp/monk.jpg', large_cover: '/tmp/monk_large.jpg', category: dramas)
 
 
 
 Video.create(title: 'South Park', description: "Animated comedy from the 1990's", 
-             small_cover_url: '/tmp/south_park.jpg', large_cover_url: '/tmp/south_park.jpg', category: reality_tv)
+             small_cover: '/tmp/south_park.jpg', large_cover: '/tmp/south_park.jpg', category: reality_tv)
 
 
 
