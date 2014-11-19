@@ -20,4 +20,4 @@
               = hidden_field_tag :invitation_token, @invitation_token
         %fieldset.actions.control-group.col-sm-offset-2
           .controls
-            = f.submit 'Sign Up', class: 'btn btn-default'
+            %script(src="https://checkout.stripe.com/checkout.js" class="stripe-button" data-key="#{Rails.configuration.stripe[:publishable_key]}" data-description="MyFliX Sign Up fee" data-amount="999" data-currency="gbp")
