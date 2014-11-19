@@ -26,38 +26,42 @@ class UsersController < ApplicationController
 
     @user = User.new(user_params)
 
-    if @user.save
+    ActiveRecord::Base.transaction do
 
-      Stripe.api_key = Rails.configuration.stripe[:secret_key]
+      begin
 
-      charge = Stripe::Charge.create(
-        card:        params[:stripeToken],
-        amount:      999,
-        description: "MyFliX SIgn Up charge for #{@user.email_address}",
-        currency:    'gbp'
-      )
+        @user.save!
 
-      AppMailer.register_email(@user).deliver
+        Stripe.api_key = Rails.configuration.stripe[:secret_key]
 
-      flash[:notice] = "New user #{@user.full_name} created and credit card payment processed."
+        begin 
+          charge = Stripe::Charge.create(
+            card:        params[:stripeToken],
+            amount:      999,
+            description: "MyFliX SIgn Up charge for #{@user.email_address}",
+            currency:    'gbp')
+        rescue Stripe::CardError => e
+          flash[:danger] = e.message
+          redirect_to :new
+        end
 
-      # Save user to session as this indicates user logged in
-      session[:user_id] = @user.id
+      rescue 
+        flash[:notice] = "Your credit card has not been charged"
+        render :new and return
+      end
 
-      handle_invited_user
-
-      redirect_to root_path
-
-    else
-      flash[:notice] = "Your credit card has not been charged"
-      render :new
     end
     
-  rescue Stripe::CardError => e
-    flash[:danger] = e.message
-    @user.delete
-    render :new
+    AppMailer.register_email(@user).deliver
 
+    flash[:notice] = "New user #{@user.full_name} created and credit card payment processed."
+
+    # Save user to session as this indicates user logged in
+    session[:user_id] = @user.id
+
+    handle_invited_user
+
+    redirect_to root_path
   end
 
   def show
