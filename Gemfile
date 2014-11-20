@@ -18,8 +18,11 @@ gem 'unicorn'                      # Muti-threaded Ruby server
 gem 'foreman'                      # To start prcesses based on Procfile on heroku
 gem 'paratrooper'                  # Easy deployment to heroku with rake tasks
 
-gem 'carrierwave'                  # Uploaded files
+gem 'carrierwave'                  # Uploading files
 gem 'mini_magick'                  # Image processing
+
+# Processing credit card payments without merchant account and gateway
+gem 'stripe'
 
 group :development do
   gem 'sqlite3'
@@ -48,6 +51,6 @@ end
 group :production do
   gem 'pg'
   gem 'rails_12factor'
-  gem 'sentry-raven', :git => 'https://github.com/getsentry/raven-ruby.git'
+  gem 'sentry-raven', git: 'https://github.com/getsentry/raven-ruby.git'
 end
 

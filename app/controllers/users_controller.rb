@@ -26,22 +26,42 @@ class UsersController < ApplicationController
 
     @user = User.new(user_params)
 
-    if @user.save
+    ActiveRecord::Base.transaction do
 
-      AppMailer.register_email(@user).deliver
+      begin
 
-      flash[:notice] = "New user #{@user.full_name} created"
+        @user.save!
 
-      # Save user to session as this indicates user logged in
-      session[:user_id] = @user.id
+        Stripe.api_key = Rails.configuration.stripe[:secret_key]
 
-      handle_invited_user
+        begin 
+          charge = Stripe::Charge.create(
+            card:        params[:stripeToken],
+            amount:      999,
+            description: "MyFliX SIgn Up charge for #{@user.email_address}",
+            currency:    'gbp')
+        rescue Stripe::CardError => e
+          flash[:danger] = e.message
+          redirect_to :new
+        end
 
-      redirect_to root_path
-    else
-      render :new
+      rescue 
+        flash[:notice] = "Your credit card has not been charged"
+        render :new and return
+      end
+
     end
     
+    AppMailer.register_email(@user).deliver
+
+    flash[:notice] = "New user #{@user.full_name} created and credit card payment processed."
+
+    # Save user to session as this indicates user logged in
+    session[:user_id] = @user.id
+
+    handle_invited_user
+
+    redirect_to root_path
   end
 
   def show
