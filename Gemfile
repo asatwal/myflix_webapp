@@ -39,13 +39,17 @@ group :development, :test do
 end
 
 group :test do
-  gem 'database_cleaner', '1.2.0'
+  gem 'database_cleaner'
   gem 'shoulda-matchers'
   gem 'fabrication'
   gem 'faker'
   gem 'capybara'
   gem 'launchy'
   gem 'capybara-email'
+  gem 'webmock'
+  gem 'vcr'
+  gem 'selenium-webdriver' # For feature tests with Capybara
+  gem 'capybara-webkit'    # Replacement for Selenium so you don't have to run with Firefox
 end
 
 group :production do
