@@ -2,7 +2,7 @@ require 'spec_helper'
 
 feature 'User invites friend' do 
 
-  scenario 'user sucessfully invites friend to join myflix and invitation accepted' do
+  scenario 'user sucessfully invites friend to join myflix and invitation accepted', {js: true, vcr: true} do
     bob = sign_in
     friend = user_invites_friend
     sign_out
@@ -13,6 +13,10 @@ feature 'User invites friend' do
     fill_in 'Password', with: 'newpassword'
     fill_in 'Confirm Password', with: 'newpassword'
     fill_in 'Full name', with: friend[:full_name]
+    fill_in 'Credit Card Number', with: '4242424242424242'
+    fill_in 'Security Code', with: '123'
+    select '11 - November', from: 'date_month'
+    select '2017', from: 'date_year'
     click_button 'Sign Up'
     expect(page).to have_content(friend[:full_name])
 

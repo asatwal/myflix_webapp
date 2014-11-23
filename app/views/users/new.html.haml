@@ -31,12 +31,12 @@
           %span.payment-errors
           .form-group
             .col-sm-6
-              %label.control-label Credit Card Number
-              %input.form-control(type="text" data-stripe='number')
+              %label.control-label(for='credit-card-number') Credit Card Number
+              %input.form-control#credit-card-number(type="text" data-stripe='number')
           .form-group
             .col-sm-6
-              %label.control-label Security Code
-              %input.form-control(type="text" data-stripe='cvc')
+              %label.control-label(for='security-code') Security Code
+              %input.form-control#security-code(type="text" data-stripe='cvc')
           .form-group
             .col-sm-3
               %label.control-label Expiration
