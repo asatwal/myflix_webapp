@@ -133,27 +133,38 @@ describe UsersController do
       let(:user) {Fabricate.build(:user)}
 
       it "sets @user (no password confirmation)" do
-        post :create, user: {email_address: user.email_address, password: user.password, password_confirmation: 'xx', full_name: user.full_name}
+        post :create, user: {email_address: user.email_address, 
+                             password: user.password, 
+                             password_confirmation: 'xx', 
+                             full_name: user.full_name}
         expect(assigns(:user)).to be_instance_of(User)  
       end
 
       it "does not create user (full name missing)" do
-        post :create, user: {email_address: user.email_address, password: user.password, password_confirmation: user.password}
+        post :create, user: {email_address: user.email_address, 
+                             password: user.password, 
+                             password_confirmation: user.password}
         expect(User.find_by(email_address: user.email_address)).to eq(nil)    
       end
 
       it "renders users/new template (email missing)" do
-        post :create, user: {password: user.password, password_confirmation: user.password, full_name: user.full_name}
+        post :create, user: {password: user.password, 
+                             password_confirmation: user.password, 
+                             full_name: user.full_name}
         expect(response).to render_template :new     
       end
 
       it "does not charge the card" do
         StripeWrapper::Charge.should_not_receive(:create)
-        post :create, user: {email_address: user.email_address, password: user.password, password_confirmation: user.password}
+        post :create, user: {email_address: user.email_address, 
+                             password: user.password, 
+                             password_confirmation: user.password}
       end
 
       it "sets flash message to say card has not been charged" do
-        post :create, user: {password: user.password, password_confirmation: user.password, full_name: user.full_name}
+        post :create, user: {password: user.password, 
+                             password_confirmation: user.password, 
+                             full_name: user.full_name}
         expect(flash[:notice]).to eq('Your credit card has not been charged')
       end
     end

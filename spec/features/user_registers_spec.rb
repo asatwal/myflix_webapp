@@ -2,7 +2,7 @@ require 'spec_helper'
 
 feature 'User registers', {js: true, vcr: true} do 
 
-  let(:new_user) {Fabricate.attributes_for(:user)}
+  let(:new_user) { Fabricate.attributes_for(:user) }
 
   scenario 'with valid user inputs and valid card' do
     register_user(new_user, true, '4242424242424242')

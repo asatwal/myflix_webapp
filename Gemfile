@@ -1,14 +1,14 @@
 source 'https://rubygems.org'
 ruby '2.1.4'
 
+gem 'bcrypt'                       # Authenticating users and hold encrypted passwords
 gem 'bootstrap-sass'
 gem 'coffee-rails'
-gem 'rails', '4.1.1'
 gem 'haml-rails'
+gem 'jquery-rails'
+gem 'rails', '4.1.1'
 gem 'sass-rails'
 gem 'uglifier'
-gem 'jquery-rails'
-gem 'bcrypt'                       # Authenticating users and hold encrypted passwords
 gem 'bootstrap_form'               # Forms that handle displaying of errors back to user
 gem 'figaro'                       # Environment variable management
 gem 'sidekiq'                      # Processing of background jobs
@@ -25,13 +25,13 @@ gem 'mini_magick'                  # Image processing
 gem 'stripe'
 
 group :development do
-  gem 'sqlite3'
-  gem 'pry'
-  gem 'pry-nav'
-  gem 'thin'
   gem "better_errors"
   gem "binding_of_caller"
   gem 'letter_opener'
+  gem 'pry'
+  gem 'pry-nav'
+  gem 'sqlite3'
+  gem 'thin'
 end
 
 group :development, :test do
@@ -39,17 +39,17 @@ group :development, :test do
 end
 
 group :test do
+  gem 'capybara'
+  gem 'capybara-email'
+  gem 'capybara-webkit'    # Replacement for Selenium so you don't have to run with Firefox
   gem 'database_cleaner'
-  gem 'shoulda-matchers'
   gem 'fabrication'
   gem 'faker'
-  gem 'capybara'
   gem 'launchy'
-  gem 'capybara-email'
+  gem 'selenium-webdriver' # For feature tests with Capybara
+  gem 'shoulda-matchers'
   gem 'webmock'
   gem 'vcr'
-  gem 'selenium-webdriver' # For feature tests with Capybara
-  gem 'capybara-webkit'    # Replacement for Selenium so you don't have to run with Firefox
 end
 
 group :production do
