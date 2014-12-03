@@ -33,8 +33,7 @@ class VideosController < ApplicationController
   end
 
   def set_video
-      @video = Video.find(params[:id])
-
+      @video = VideoDecorator.new(Video.find(params[:id]))
   end
 
   def review_params

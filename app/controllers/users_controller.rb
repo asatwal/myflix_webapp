@@ -26,33 +26,18 @@ class UsersController < ApplicationController
 
     @user = User.new(user_params)
 
-    if @user.valid?
+    result = UserSignup.new(@user).sign_up params[:stripeToken], params[:invitation_token]
 
-      charge = StripeWrapper::Charge.create(
-        card:        params[:stripeToken],
-        amount:      999,
-        description: "MyFliX SIgn Up charge for #{@user.email_address}"
-        )
+    if result.success?
 
-      if charge.success?
-        @user.save
-        AppMailer.register_email(@user).deliver
+      # Save user to session as this indicates user logged in
+      session[:user_id] = result.user_id
 
-        flash[:notice] = "New user #{@user.full_name} created and credit card payment processed."
-
-        # Save user to session as this indicates user logged in
-        session[:user_id] = @user.id
-
-        handle_invited_user
-
-        redirect_to root_path
-      else
-        flash[:danger] = charge.error_message
-        render :new
-      end
+      flash[:notice] = result.message
+      redirect_to root_path
     else
-      flash[:notice] = "Your credit card has not been charged"
-      render :new 
+      flash[:danger] = result.message
+      render :new
     end
   end
 
@@ -68,22 +53,6 @@ class UsersController < ApplicationController
 
   def ensure_no_user
     redirect_to root_path if current_user
-  end
-
-  def handle_invited_user
-    # Presence of token in parameters indicates an invited user
-    if params[:invitation_token].present?
-
-      invitation = Invitation.find_by(token: params[:invitation_token])
-
-      if invitation
-        @user.follow invitation.inviter
-
-        invitation.inviter.follow @user
-
-        invitation.update_column(:token, nil)
-      end
-    end
   end
 
 end

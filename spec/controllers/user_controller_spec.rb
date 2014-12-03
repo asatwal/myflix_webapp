@@ -61,52 +61,36 @@ describe UsersController do
     
     context "with valid inputs and valid payment info" do
 
+      let(:user_attrs) {Fabricate.attributes_for(:user)}
+
       before do
-        charge = double(:charge, success?: true)
-        StripeWrapper::Charge.should_receive(:create).and_return(charge)
+        result = double(:result, success?: true, message: 'New user created and card payment processed', user_id: 1)
+        UserSignup.any_instance.should_receive(:sign_up).and_return(result)
       end
 
-      it "creates user" do
-        user_attrs = Fabricate.attributes_for(:user)
-        post :create, user: user_attrs, stripeToken: token
-        expect(assigns(:user)).to eq(User.find_by(email_address: user_attrs[:email_address]))
-      end
 
       it "redirects to root_path" do
-        post :create, user: Fabricate.attributes_for(:user), stripeToken: token
+        post :create, user: user_attrs, stripeToken: token
         expect(response).to redirect_to root_path    
       end
 
-      it "sets user_id in session" do
-        user_attrs = Fabricate.attributes_for(:user)
+      it "sets the success flash message" do
         post :create, user: user_attrs, stripeToken: token
-        expect(session[:user_id]).to eq(User.find_by(email_address: user_attrs[:email_address]).id)
+        expect(flash[:notice]).to eq('New user created and card payment processed')
       end
 
-      it "sets the inviter as follower of invitee if token exists" do
-        user_attrs = Fabricate.attributes_for(:user, email_address: invitation.email_address)
-        post :create, user: user_attrs, invitation_token: invitation.token, stripeToken: token
-        expect(invitation.inviter.follows?assigns(:user)).to be true
+      it "sets user_id in session" do
+        post :create, user: user_attrs, stripeToken: token
+        expect(session[:user_id]).to eq(1)
       end
 
-      it "sets the invitee as follower of inviter if token exists" do
-        user_attrs = Fabricate.attributes_for(:user, email_address: invitation.email_address)
-        post :create, user: user_attrs, invitation_token: invitation.token, stripeToken: token
-        expect(assigns(:user).follows?invitation.inviter).to be true
-      end
-
-      it "clears invitation token" do
-        user_attrs = Fabricate.attributes_for(:user, email_address: invitation.email_address)
-        post :create, user: user_attrs, invitation_token: invitation.token, stripeToken: token
-        expect(Invitation.find_by(email_address: invitation.email_address).token).to be_nil
-      end
     end
 
     context "with valid inputs and invalid payment details" do
 
       before do
-        charge = double(:charge, success?: false, error_message: 'Your card was declined')
-        StripeWrapper::Charge.should_receive(:create).and_return(charge)
+        result = double(:result, success?: false, message: 'Your card was declined')
+        UserSignup.any_instance.should_receive(:sign_up).and_return(result)
       end
 
       let(:user_attrs) {Fabricate.attributes_for(:user)}
@@ -130,22 +114,12 @@ describe UsersController do
 
     context "with invalid inputs and valid payment details" do
 
+      before do
+        result = double(:result, success?: false, message: 'User details are invalid.')
+        UserSignup.any_instance.should_receive(:sign_up).and_return(result)
+      end
+
       let(:user) {Fabricate.build(:user)}
-
-      it "sets @user (no password confirmation)" do
-        post :create, user: {email_address: user.email_address, 
-                             password: user.password, 
-                             password_confirmation: 'xx', 
-                             full_name: user.full_name}
-        expect(assigns(:user)).to be_instance_of(User)  
-      end
-
-      it "does not create user (full name missing)" do
-        post :create, user: {email_address: user.email_address, 
-                             password: user.password, 
-                             password_confirmation: user.password}
-        expect(User.find_by(email_address: user.email_address)).to eq(nil)    
-      end
 
       it "renders users/new template (email missing)" do
         post :create, user: {password: user.password, 
@@ -154,18 +128,11 @@ describe UsersController do
         expect(response).to render_template :new     
       end
 
-      it "does not charge the card" do
-        StripeWrapper::Charge.should_not_receive(:create)
-        post :create, user: {email_address: user.email_address, 
-                             password: user.password, 
-                             password_confirmation: user.password}
-      end
-
-      it "sets flash message to say card has not been charged" do
+      it "sets flash message to say User details invalid" do
         post :create, user: {password: user.password, 
                              password_confirmation: user.password, 
                              full_name: user.full_name}
-        expect(flash[:notice]).to eq('Your credit card has not been charged')
+        expect(flash[:danger]).to eq('User details are invalid.')
       end
     end
   end
@@ -186,58 +153,6 @@ describe UsersController do
     end
   end
 
-  describe "SEND email on new user" do
-
-    before do
-      charge = double(:charge, success?: true)
-      StripeWrapper::Charge.should_receive(:create).and_return(charge)
-    end
-
-    # As the mail sending is not part os the database transaction 
-    # it is not cleared from database
-
-    after {ActionMailer::Base.deliveries.clear}
-
-    it "sends email" do
-      user_attrs = Fabricate.attributes_for(:user)
-      post :create, user: user_attrs, stripeToken: token
-      ActionMailer::Base.deliveries.should_not be_empty
-    end
-
-    it "sends email to correct recipient" do
-      user_attrs = Fabricate.attributes_for(:user)
-      post :create, user: user_attrs, stripeToken: token
-      message = ActionMailer::Base.deliveries.last
-      message.to.should eq [user_attrs[:email_address]] 
-    end
-
-    it "sends email with correct Subject" do
-      user_attrs = Fabricate.attributes_for(:user)
-      post :create, user: user_attrs, stripeToken: token
-      message = ActionMailer::Base.deliveries.last
-      message.subject.should eq "Welcome to MyFlix" 
-    end
-
-    it "sends email with correct content" do
-      user_attrs = Fabricate.attributes_for(:user)
-      post :create, user: user_attrs, stripeToken: token
-      message = ActionMailer::Base.deliveries.last
-      message.body.should include user_attrs[:full_name] 
-    end
-
-
-  end
-
-  describe "SEND email on new user with invalid input" do
-
-    before {ActionMailer::Base.deliveries.clear}
-
-    it "does not send email on invalid input" do
-      user_attrs = Fabricate.attributes_for(:user)
-      post :create, user: {email_address: 'bob@email.com'}, stripeToken: token
-      ActionMailer::Base.deliveries.should be_empty
-    end
-  end
 
 end
 
