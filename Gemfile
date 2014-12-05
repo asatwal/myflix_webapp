@@ -4,6 +4,7 @@ ruby '2.1.4'
 gem 'bcrypt'                       # Authenticating users and hold encrypted passwords
 gem 'bootstrap-sass'
 gem 'coffee-rails'
+gem 'draper'                       # Helper for decorators
 gem 'haml-rails'
 gem 'jquery-rails'
 gem 'rails', '4.1.1'

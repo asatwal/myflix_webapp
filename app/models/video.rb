@@ -39,11 +39,10 @@ class Video < ActiveRecord::Base
       end
     end
 
-    return "None" if size == 0
+    return nil if size == 0
 
     average = number_with_precision(total / size, precision: 1)
 
-    "#{average}/5.0"
   end
 
 end

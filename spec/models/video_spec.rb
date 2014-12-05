@@ -78,12 +78,12 @@ describe Video do
 end
 
 describe "#average_rating" do
-  it "returns rating 'None' if no reviews" do
+  it "returns rating Nil if no reviews" do
     futurama = Video.create(title: 'Futurama', description: 'Space adventure')
-    expect(futurama.average_rating).to eq('None')
+    expect(futurama.average_rating).to be_nil
   end
 
-  it "returns rating '3.0/5.0' for multiple reviews with rating 3" do
+  it "returns rating 3.0 for multiple reviews with rating 3" do
     video = Fabricate(:video)
     user = Fabricate(:user)
 
@@ -91,7 +91,7 @@ describe "#average_rating" do
       Fabricate(:review, rating: 3, user: user, reviewable: video)
     end
 
-    expect(video.average_rating).to eq('3.0/5.0')
+    expect(video.average_rating).to eq('3.0')
   end
 end
 
