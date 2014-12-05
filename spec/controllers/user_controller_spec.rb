@@ -65,7 +65,7 @@ describe UsersController do
 
       before do
         result = double(:result, success?: true, message: 'New user created and card payment processed', user_id: 1)
-        UserSignup.any_instance.should_receive(:sign_up).and_return(result)
+        expect_any_instance_of(UserSignup).to receive(:sign_up).and_return(result)
       end
 
 
@@ -90,7 +90,7 @@ describe UsersController do
 
       before do
         result = double(:result, success?: false, message: 'Your card was declined')
-        UserSignup.any_instance.should_receive(:sign_up).and_return(result)
+        expect_any_instance_of(UserSignup).to receive(:sign_up).and_return(result)
       end
 
       let(:user_attrs) {Fabricate.attributes_for(:user)}
@@ -116,7 +116,7 @@ describe UsersController do
 
       before do
         result = double(:result, success?: false, message: 'User details are invalid.')
-        UserSignup.any_instance.should_receive(:sign_up).and_return(result)
+        expect_any_instance_of(UserSignup).to receive(:sign_up).and_return(result)
       end
 
       let(:user) {Fabricate.build(:user)}

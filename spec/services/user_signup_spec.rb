@@ -12,7 +12,7 @@ describe UserSignup do
 
       before do
         charge = double(:charge, success?: true)
-        StripeWrapper::Charge.should_receive(:create).and_return(charge)
+        expect(StripeWrapper::Charge).to receive(:create).and_return(charge)
       end
 
       it "creates user" do
@@ -46,7 +46,7 @@ describe UserSignup do
 
       before do
         charge = double(:charge, success?: false, error_message: 'Your card was declined')
-        StripeWrapper::Charge.should_receive(:create).and_return(charge)
+        expect(StripeWrapper::Charge).to receive(:create).and_return(charge)
       end
 
       it "sets flash message to invalid card payment message" do
@@ -69,7 +69,7 @@ describe UserSignup do
     context "with invalid inputs and valid payment details" do
 
       before do
-        StripeWrapper::Charge.should_not_receive(:create)
+        expect(StripeWrapper::Charge).to_not receive(:create)
       end
 
       it "result returns error (no password confirmation)" do
@@ -102,7 +102,7 @@ describe UserSignup do
 
       before do
         charge = double(:charge, success?: true)
-        StripeWrapper::Charge.should_receive(:create).and_return(charge)
+        expect(StripeWrapper::Charge).to receive(:create).and_return(charge)
       end
 
       # As the mail sending is not part os the database transaction 
@@ -137,7 +137,7 @@ describe UserSignup do
     describe "Does NOT SEND email on new user with invalid input" do
 
       before do
-        StripeWrapper::Charge.should_not_receive(:create)
+        expect(StripeWrapper::Charge).to_not receive(:create)
         ActionMailer::Base.deliveries.clear
       end
 
