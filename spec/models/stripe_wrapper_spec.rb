@@ -73,6 +73,10 @@ describe StripeWrapper do
         it 'creates customer successfully', :vcr do
           expect(customer).to be_success
         end
+
+        it 'creates customer payment token successfully', :vcr do
+          expect(customer.payment_token).to be_present
+        end
       end
 
       context 'with an invalid card' do

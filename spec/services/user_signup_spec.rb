@@ -6,12 +6,13 @@ describe UserSignup do
 
     let(:invitation) {Fabricate(:invitation, inviter: Fabricate(:user))}
     let(:stripe_token) {'1234560'}
+    let(:customer_payment_token) {'1234abcd'}
     let(:user) {Fabricate.build(:user, email_address: 'user_signup@user.com')}
 
     context "with valid inputs and valid payment info" do
 
       before do
-        customer = double(:customer, success?: true)
+        customer = double(:customer, success?: true, payment_token: customer_payment_token)
         expect(StripeWrapper::Customer).to receive(:create).and_return(customer)
       end
 
@@ -38,6 +39,11 @@ describe UserSignup do
       it "clears invitation token" do
         result = UserSignup.new(user).sign_up stripe_token, invitation.token
         expect(Invitation.find_by(email_address: invitation.email_address).token).to be_nil
+      end
+
+      it "stores the payment token from stripe" do
+        result = UserSignup.new(user).sign_up stripe_token, invitation.token
+        expect(User.last.payment_token).to eq(customer_payment_token)
       end
 
     end
@@ -101,7 +107,7 @@ describe UserSignup do
     describe "SEND email on new user" do
 
       before do
-        customer = double(:customer, success?: true)
+        customer = double(:customer, success?: true, payment_token: customer_payment_token)
         expect(StripeWrapper::Customer).to receive(:create).and_return(customer)
       end
 

@@ -57,6 +57,11 @@ module StripeWrapper
     def success?
       response.present?
     end
+
+    def payment_token
+      response.id
+    end
+
   end
 
 end

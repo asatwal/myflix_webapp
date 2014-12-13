@@ -15,6 +15,7 @@ class UserSignup
         )
 
       if charge.success?
+        @user.payment_token = charge.payment_token
         @user.save
 
         AppMailer.register_email(@user).deliver
