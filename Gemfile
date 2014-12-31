@@ -15,6 +15,7 @@ gem 'figaro'                       # Environment variable management
 gem 'sidekiq'                      # Processing of background jobs
 gem 'sinatra', require: false
 gem 'slim'
+gem 'stripe_event'                 # Stripe webhook integration for Rails 
 gem 'unicorn'                      # Muti-threaded Ruby server
 gem 'foreman'                      # To start prcesses based on Procfile on heroku
 gem 'paratrooper'                  # Easy deployment to heroku with rake tasks

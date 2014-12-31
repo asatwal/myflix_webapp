@@ -6,13 +6,14 @@ describe UserSignup do
 
     let(:invitation) {Fabricate(:invitation, inviter: Fabricate(:user))}
     let(:stripe_token) {'1234560'}
+    let(:customer_payment_token) {'1234abcd'}
     let(:user) {Fabricate.build(:user, email_address: 'user_signup@user.com')}
 
     context "with valid inputs and valid payment info" do
 
       before do
-        charge = double(:charge, success?: true)
-        expect(StripeWrapper::Charge).to receive(:create).and_return(charge)
+        customer = double(:customer, success?: true, payment_token: customer_payment_token)
+        expect(StripeWrapper::Customer).to receive(:create).and_return(customer)
       end
 
       it "creates user" do
@@ -40,13 +41,18 @@ describe UserSignup do
         expect(Invitation.find_by(email_address: invitation.email_address).token).to be_nil
       end
 
+      it "stores the payment token from stripe" do
+        result = UserSignup.new(user).sign_up stripe_token, invitation.token
+        expect(User.last.payment_token).to eq(customer_payment_token)
+      end
+
     end
 
     context "with valid inputs and invalid payment details" do
 
       before do
-        charge = double(:charge, success?: false, error_message: 'Your card was declined')
-        expect(StripeWrapper::Charge).to receive(:create).and_return(charge)
+        customer = double(:customer, success?: false, error_message: 'Your card was declined')
+        expect(StripeWrapper::Customer).to receive(:create).and_return(customer)
       end
 
       it "sets flash message to invalid card payment message" do
@@ -69,7 +75,7 @@ describe UserSignup do
     context "with invalid inputs and valid payment details" do
 
       before do
-        expect(StripeWrapper::Charge).to_not receive(:create)
+        expect(StripeWrapper::Customer).to_not receive(:create)
       end
 
       it "result returns error (no password confirmation)" do
@@ -101,8 +107,8 @@ describe UserSignup do
     describe "SEND email on new user" do
 
       before do
-        charge = double(:charge, success?: true)
-        expect(StripeWrapper::Charge).to receive(:create).and_return(charge)
+        customer = double(:customer, success?: true, payment_token: customer_payment_token)
+        expect(StripeWrapper::Customer).to receive(:create).and_return(customer)
       end
 
       # As the mail sending is not part os the database transaction 
@@ -137,7 +143,7 @@ describe UserSignup do
     describe "Does NOT SEND email on new user with invalid input" do
 
       before do
-        expect(StripeWrapper::Charge).to_not receive(:create)
+        expect(StripeWrapper::Customer).to_not receive(:create)
         ActionMailer::Base.deliveries.clear
       end
 

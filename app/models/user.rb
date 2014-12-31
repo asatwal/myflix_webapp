@@ -47,4 +47,8 @@ class User < ActiveRecord::Base
     following_rels.create(leader: other_user) if can_follow?other_user
   end
 
+  def deactivate!
+    update_column(:active, false)
+  end
+
 end

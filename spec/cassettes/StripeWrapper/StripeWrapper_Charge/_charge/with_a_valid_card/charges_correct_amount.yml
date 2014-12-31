@@ -31,7 +31,7 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Thu, 20 Nov 2014 21:53:14 GMT
+      - Sun, 07 Dec 2014 16:52:45 GMT
       Content-Type:
       - application/json;charset=utf-8
       Content-Length:
@@ -45,7 +45,7 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - 55945efd-1771-498d-9b8a-c84195f5241f
+      - req_H8qhjw9a9x1ChofR
       Stripe-Version:
       - '2014-11-05'
       Strict-Transport-Security:
@@ -54,14 +54,14 @@ http_interactions:
       encoding: UTF-8
       string: |
         {
-          "id": "tok_1512rVFgKcqrRTFpwRTOsPF7",
+          "id": "tok_1578H2FgKcqrRTFpCu99pPQF",
           "livemode": false,
-          "created": 1416520393,
+          "created": 1417971164,
           "used": false,
           "object": "token",
           "type": "card",
           "card": {
-            "id": "card_1512rVFgKcqrRTFpFf7L0F2x",
+            "id": "card_1578H2FgKcqrRTFp7hH6PltI",
             "object": "card",
             "last4": "4242",
             "brand": "Visa",
@@ -82,13 +82,13 @@ http_interactions:
           }
         }
     http_version: 
-  recorded_at: Thu, 20 Nov 2014 21:53:14 GMT
+  recorded_at: Sun, 07 Dec 2014 16:52:45 GMT
 - request:
     method: post
     uri: https://api.stripe.com/v1/charges
     body:
       encoding: US-ASCII
-      string: card=tok_1512rVFgKcqrRTFpwRTOsPF7&amount=315&description=Valid%20test%20charge&currency=gbp
+      string: card=tok_1578H2FgKcqrRTFpCu99pPQF&amount=315&description=Valid%20test%20charge&currency=gbp
     headers:
       Accept:
       - "*/*; q=0.5, application/xml"
@@ -114,7 +114,7 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Thu, 20 Nov 2014 21:53:15 GMT
+      - Sun, 07 Dec 2014 16:52:45 GMT
       Content-Type:
       - application/json;charset=utf-8
       Content-Length:
@@ -128,7 +128,7 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - b3ee89b1-1c84-4d7e-b62c-d39d1acea211
+      - req_KpmGPJ4xCH14ER7k
       Stripe-Version:
       - '2014-11-05'
       Strict-Transport-Security:
@@ -137,16 +137,24 @@ http_interactions:
       encoding: UTF-8
       string: |
         {
-          "id": "ch_1512rWFgKcqrRTFpWaZQSAk4",
+          "id": "ch_1578H3FgKcqrRTFp1jyCWLll",
           "object": "charge",
-          "created": 1416520394,
+          "created": 1417971165,
           "livemode": false,
           "paid": true,
           "amount": 315,
           "currency": "gbp",
           "refunded": false,
+          "captured": true,
+          "refunds": {
+            "object": "list",
+            "total_count": 0,
+            "has_more": false,
+            "url": "/v1/charges/ch_1578H3FgKcqrRTFp1jyCWLll/refunds",
+            "data": []
+          },
           "card": {
-            "id": "card_1512rVFgKcqrRTFpFf7L0F2x",
+            "id": "card_1578H2FgKcqrRTFp7hH6PltI",
             "object": "card",
             "last4": "4242",
             "brand": "Visa",
@@ -168,15 +176,7 @@ http_interactions:
             "dynamic_last4": null,
             "customer": null
           },
-          "captured": true,
-          "refunds": {
-            "object": "list",
-            "total_count": 0,
-            "has_more": false,
-            "url": "/v1/charges/ch_1512rWFgKcqrRTFpWaZQSAk4/refunds",
-            "data": []
-          },
-          "balance_transaction": "txn_1512rWFgKcqrRTFpygeBhvw4",
+          "balance_transaction": "txn_1578H3FgKcqrRTFpq7KntW0E",
           "failure_message": null,
           "failure_code": null,
           "amount_refunded": 0,
@@ -195,5 +195,5 @@ http_interactions:
           "shipping": null
         }
     http_version: 
-  recorded_at: Thu, 20 Nov 2014 21:53:15 GMT
+  recorded_at: Sun, 07 Dec 2014 16:52:46 GMT
 recorded_with: VCR 2.9.3

@@ -9,13 +9,13 @@ class UserSignup
   def sign_up(stripe_token, invitation_token)
 
     if @user.valid?
-      charge = StripeWrapper::Charge.create(
-        card:        stripe_token,
-        amount:      999,
-        description: "MyFliX SIgn Up charge for #{@user.email_address}"
+      charge = StripeWrapper::Customer.create(
+        card:      stripe_token,
+        user:      @user
         )
 
       if charge.success?
+        @user.payment_token = charge.payment_token
         @user.save
 
         AppMailer.register_email(@user).deliver

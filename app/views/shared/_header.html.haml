@@ -21,4 +21,7 @@
               = link_to "Invite a Friend", new_invitation_path
               %a(href="#") Account
               %a(href="#") Plan and Billing
+              - if current_user.admin
+                %a= link_to "View User Payments (*Admin)", admin_payments_path
+                %a= link_to "Create New Video (*Admin)", new_admin_video_path
               %a= link_to "Sign Out", sign_out_path

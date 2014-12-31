@@ -98,4 +98,12 @@ describe User do
     end
   end
 
+  describe "#deactive!" do
+    it "deactives the user" do
+      san = Fabricate(:user, email_address: 'san@san.com', active: true)
+      san.deactivate!
+      expect(san).to_not be_active
+    end
+  end
+
 end

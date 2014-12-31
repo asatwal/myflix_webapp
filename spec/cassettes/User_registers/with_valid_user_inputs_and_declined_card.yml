@@ -2,10 +2,10 @@
 http_interactions:
 - request:
     method: post
-    uri: https://api.stripe.com/v1/charges
+    uri: https://api.stripe.com/v1/customers
     body:
       encoding: US-ASCII
-      string: card=tok_151nLpFgKcqrRTFpZcYr0X3Q&amount=999&description=MyFliX%20SIgn%20Up%20charge%20for%20adele.wuckert%40rolfson.org&currency=gbp
+      string: card=tok_1578hRFgKcqrRTFpO06FwVSn&plan=Base&email=elnora.bosco%40anderson.com
     headers:
       Accept:
       - "*/*; q=0.5, application/xml"
@@ -22,7 +22,7 @@ http_interactions:
         a-atwals-imac 13.4.0 Darwin Kernel Version 13.4.0: Sun Aug 17 19:50:11 PDT
         2014; root:xnu-2422.115.4~1/RELEASE_X86_64 x86_64"}'
       Content-Length:
-      - '133'
+      - '77'
   response:
     status:
       code: 402
@@ -31,11 +31,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Sat, 22 Nov 2014 23:31:39 GMT
+      - Sun, 07 Dec 2014 17:20:02 GMT
       Content-Type:
       - application/json;charset=utf-8
       Content-Length:
-      - '162'
+      - '117'
       Access-Control-Allow-Credentials:
       - 'true'
       Access-Control-Allow-Methods:
@@ -45,7 +45,7 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - d0465e4a-8752-46aa-a2ba-222b1e3ff288
+      - req_s86upmrGfjLEZYZ6
       Stripe-Version:
       - '2014-11-05'
       Strict-Transport-Security:
@@ -57,10 +57,9 @@ http_interactions:
           "error": {
             "message": "Your card was declined.",
             "type": "card_error",
-            "code": "card_declined",
-            "charge": "ch_151nLrFgKcqrRTFpBmCwjtcP"
+            "code": "card_declined"
           }
         }
     http_version: 
-  recorded_at: Sat, 22 Nov 2014 23:31:40 GMT
+  recorded_at: Sun, 07 Dec 2014 17:20:02 GMT
 recorded_with: VCR 2.9.3
