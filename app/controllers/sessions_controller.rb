@@ -14,12 +14,12 @@ class SessionsController < ApplicationController
         redirect_to root_path, notice: 'You have successfully signed in'
       else
         flash[:danger] = "Your account has been suspended. Please contact customer services."
+        render :new     
       end
     else
       flash[:danger] = "Incorrect Username or Password" 
+      render :new     
     end
-    
-    render :new     
   end
 
   def destroy
